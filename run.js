@@ -1,13 +1,13 @@
 const puppeteer = require('puppeteer');
 const readline = require('readline');
 
-async function readText() {
+async function readText(question) {
     return new Promise((resolve, reject) => {
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
-        rl.question('Enter the sms code\n', (answer) => {
+        rl.question(question + '\n', (answer) => {
             rl.close();
             resolve(answer);
         });
@@ -25,21 +25,20 @@ async function login() {
     try {
         await page.goto('http://163.net', {waitUntil: 'networkidle2'});
 
-        let phoneNum = await readText();
-        await page.type('#msg-phoneNum', phoneNum);
+        let phoneNum = await readText('Enter the phone number');
+        phoneNum = phoneNum.trim();
 
+        await page.type('#msg-phoneNum', phoneNum);
         await page.click('#msg-sendPassword');
 
-        let sms = await readText();
+        let sms = await readText('Enter the sms code');
         sms = sms.trim();
-
-        console.log('sms typed');
         await page.type('#msg-authPassword', sms);
         await page.click('#msg-submitSms');
 
-        console.log('clicked');
+        console.log('login');
         await sleep(5000);
-        console.log('go to baidu');
+        console.log('connected');
 
         await page.close();
         await browser.close();
